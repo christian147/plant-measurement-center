@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/fontawesome.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/brands.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/solid.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="styles/index.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Measurement Center</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet">
+    <script type="text/javascript" src="scripts/index.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <main class="d-flex h-100">
+        <div class="dashboard">
+            <div class="dashboard__title">&lt;Name of Plant&gt;</div>
+            <div class="dashboard__card dashboard__card--temperature">
+                <i class="dashboard__card-icon fas fa-thermometer-half fa-3x"></i>
+                <div class="dashboard__card-title">Temperature</div>
+                <div class="dashboard__card-data">
+                    <span class="dashboard__card-data-value" id="temperature"></span>
+                    <span class="dashboard__card-data-unit-of-mesure">&deg;C</span></div>
+            </div>
+            <div class="dashboard__card dashboard__card--humidity">
+                <i class="dashboard__card-icon fas fa-tint fa-3x"></i>
+                <div class="dashboard__card-title">Humidity</div>
+                <div class="dashboard__card-data">
+                    <span class="dashboard__card-data-value" id="humidity"></span>
+                    <span class="dashboard__card-data-unit-of-mesure">%</span></div>
+            </div>
+            <div class="dashboard__card dashboard__card--soil-humidity">
+                <i class="dashboard__card-icon fas fa-seedling fa-3x"></i>
+                <div class="dashboard__card-title">Soil Humidity</div>
+                <div class="dashboard__card-data">
+                    <span class="dashboard__card-data-value" id="soilHumidity"></span>
+                    <span class="dashboard__card-data-unit-of-mesure">%</span></div>
+            </div>
+            <div class="dashboard__card dashboard__card--illumination disabled">
+                <i class="dashboard__card-icon fas fa-sun fa-3x"></i>
+                <div class="dashboard__card-title">Illumination</div>
+                <div class="dashboard__card-data">
+                    <span class="dashboard__card-data-value" id="illumination"></span>
+                    <span class="dashboard__card-data-unit-of-mesure">LUX</span></div>
+            </div>
+            <button type="button" id="watering"
+                class="dashboard__water-button btn btn-dark btn-lg btn-block"></p></button>
+        </div>
+    </main>
+</body>
+
+</html>

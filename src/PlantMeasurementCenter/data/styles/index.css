@@ -1,0 +1,148 @@
+:root {
+    --temperature: #f29c1f;
+    --humidity: #3b97d3;
+    --soil-humidity: #26b99a;
+    --illumination: #e2de0c;
+    --disabled: #f0f0e9;
+  }
+
+html, body {
+    height: 100%;
+}
+body {
+    margin: 0;
+}
+
+.dashboard {
+    height: 100%;
+    width: 100%;
+    padding: 1rem;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.dashboard__title {
+    padding: 1rem;
+    font-size: 3rem;
+    max-width: 30rem;
+    width: 100%;
+    text-align: center;
+}
+
+.dashboard__card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 2px solid;
+    width: 100%;
+    padding: 1rem;
+    min-height: 6rem;
+    max-width: 30rem;
+    border-radius: .25rem;
+    margin-bottom: 0.75rem;
+    min-width: 6rem;
+}
+
+.dashboard__card.disabled { 
+    background-color: var(--disabled);
+}
+
+.dashboard__card-icon {
+    display: flex;
+    justify-content: center;
+    min-width: 3rem;
+}
+
+.dashboard__card-title {
+    font-weight: 600;
+    font-size: 2rem;
+    width: 100%;
+    padding-left: 1rem;
+}
+
+.dashboard__card-data {
+    font-weight: 300;
+    min-width: 6rem;
+    min-height: 4.70rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.dashboard__card-data-value {
+    font-size: 3rem;
+}
+
+.dashboard__card-data-unit-of-mesure {
+    font-size: 17px;
+    font-weight: 600;
+    padding-bottom: 2rem;
+    padding-left: .125rem;
+}
+
+.dashboard__card--temperature {
+    color: var(--temperature);
+    border-color: var(--temperature);
+}
+
+.dashboard__card--humidity {
+    color: var(--humidity);
+    border-color: var(--humidity);
+}
+
+.dashboard__card--soil-humidity {
+    color: var(--soil-humidity);
+    border-color: var(--soil-humidity);
+}
+
+.dashboard__card--illumination {
+    color: var(--illumination);
+    border-color: var(--illumination);
+}
+
+.dashboard__water-button {
+    display: flex!important;
+    justify-content: center;
+    max-width: 12rem;
+    height: 4rem;
+    align-items: center;
+}
+
+@media (max-width: 599px) {
+    .dashboard__title {
+        font-size: 3rem;
+    }
+
+    .dashboard__card-title {
+        font-size: 2rem;
+    }
+
+    .dashboard__card-data-value {
+        font-size: 2rem;
+    }
+
+    .dashboard__card-data-unit-of-mesure { 
+        padding-bottom: 1rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .dashboard__title {
+        font-size: 2.75rem;
+    }
+
+    .dashboard__card-title {
+        font-size: 1.25rem;
+    }
+
+    .dashboard__card-data-value {
+        font-size: 2rem;
+    }
+
+    .dashboard__card-data-unit-of-mesure { 
+        padding-bottom: 1rem;
+    }
+}
