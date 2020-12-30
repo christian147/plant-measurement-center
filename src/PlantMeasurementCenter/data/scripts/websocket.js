@@ -5,6 +5,7 @@ window.onload = function () {
   const temperature = document.getElementById('temperature');
   const humidity = document.getElementById('humidity');
   const soilHumidity = document.getElementById('soilHumidity');
+  const illumination = document.getElementById('illumination');
   const watering = document.getElementById('watering');
 
   var connection = new WebSocket(
@@ -28,6 +29,7 @@ window.onload = function () {
       temperature.textContent = response.temperature;
       humidity.textContent = response.humidity;
       soilHumidity.textContent = response.soilHumidity;
+      illumination.textContent = response.illumination;
       watering.textContent = response.isWatering ? StopWateringLabel : StartWateringLabel;
     } else if (response.command === 'water') {
       watering.textContent = response.isWatering ? StopWateringLabel : StartWateringLabel;

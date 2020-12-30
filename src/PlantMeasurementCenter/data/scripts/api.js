@@ -2,11 +2,13 @@ window.onload = function () {
   const StartWateringLabel = 'Start watering';
   const StopWateringLabel = 'Stop watering';
   const waterApiEndpoint = '/api/water';
+  const measurementsApiEndpoint = '/api/measurements';
 
   const temperature = document.getElementById('temperature');
   const humidity = document.getElementById('humidity');
   const soilHumidity = document.getElementById('soilHumidity');
   const watering = document.getElementById('watering');
+  const illumination = document.getElementById('illumination');
   var refreshIn = 10000;
 
   getMeasurements();
@@ -35,13 +37,14 @@ window.onload = function () {
         temperature.textContent = measurements.temperature;
         humidity.textContent = measurements.humidity;
         soilHumidity.textContent = measurements.soilHumidity;
+        illumination.textContent = measurements.illumination;
         refreshIn = measurements.refreshIn;
         watering.textContent = measurements.isWatering
           ? StopWateringLabel
           : StartWateringLabel;
       }
     };
-    xmlhttp.open('GET', '/api/measurements', true);
+    xmlhttp.open('GET', measurementsApiEndpoint, true);
     xmlhttp.send();
   }
 

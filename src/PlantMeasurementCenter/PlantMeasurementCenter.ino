@@ -6,6 +6,7 @@
 #include <ArduinoJson.h>
 #include "WifiConfig.h"
 #include "Settings.h"
+#include "DFRobot_VEML7700.h"
 
 uint8_t MoistureSensorPin = MOISTURE_SENSOR_PIN;
 uint8_t DHTPin = DHT_PIN;
@@ -14,12 +15,15 @@ int relayState = LOW;
 float Temperature;
 float Humidity;
 int SoilHumidity;
+float Illumination;
 unsigned long previousMillis;
 
 DHT dht(DHTPin, DHT_TYPE);
 AsyncWebServer server(WEB_PORT);
 WebSocketsServer webSocketServer = WebSocketsServer(WEBSOCKET_PORT);
 WifiConfig wifiConfig;
+
+DFRobot_VEML7700 als;
 
 void setup()
 {
@@ -30,6 +34,8 @@ void setup()
   digitalWrite(DHTPin, HIGH);
   dht.begin();
 
+  als.begin();
+  
   wifiConfig.Connect();
 
   if (WEB_PUBLISHED) {
@@ -56,6 +62,7 @@ void setup()
         jsonDoc["temperature"] = Temperature;
         jsonDoc["humidity"] = Humidity;
         jsonDoc["soilHumidity"] = SoilHumidity;
+        jsonDoc["illumination"] = round(Illumination);
         jsonDoc["refreshIn"] = WEB_DATA_REFRESH;
         jsonDoc["isWatering"] = digitalRead(RelayPin) == LOW;
         serializeJson(jsonDoc, measurements);
@@ -88,6 +95,8 @@ void loop()
     int sensor = analogRead(MoistureSensorPin);
     SoilHumidity = map(sensor, MOISTURE_SENSOR_WET, MOISTURE_SENSOR_DRY, 100, 0);
 
+    als.getALSLux(Illumination);
+
     if (WEB_PUBLISHED && WEBSOCKET_ENABLED) {
       String measurements;
       StaticJsonDocument<120> jsonDoc;
@@ -95,6 +104,7 @@ void loop()
       jsonDoc["temperature"] = Temperature;
       jsonDoc["humidity"] = Humidity;
       jsonDoc["soilHumidity"] = SoilHumidity;
+      jsonDoc["illumination"] = round(Illumination);
       jsonDoc["refreshIn"] = WEB_DATA_REFRESH;
       jsonDoc["isWatering"] = digitalRead(RelayPin) == LOW;
       serializeJson(jsonDoc, measurements);
