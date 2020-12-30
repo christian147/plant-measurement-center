@@ -1,25 +1,26 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#define DHT_TYPE                    <Dht type>       //DHT11 | DHT22
-#define DHT_PIN                     <Digital port>   //example: D5
-#define WATER_PUMP_RELAY_PIN        <Digital port>   //example: D6
-
-#define MOISTURE_SENSOR_DRY         <Dry Measurement of moisture sensor>
-#define MOISTURE_SENSOR_WET         <Wet Measurement of moisture sensor>
-#define MOISTURE_SENSOR_PIN         <Analog port>   //example: A0    
-
-#define CONFIG_WIFI_SSID            <SSID Name>
-#define CONFIG_WIFI_PASSWORD        <SSID Password>
-#define CONFIG_WIFI_STATIC_IP       true
-IPAddress ip(192, 168, 1, 23);
-IPAddress gateway(192, 168, 1, 1);
-IPAddress subnet(255, 255, 255, 0);
-
-#define WEB_PUBLISHED               true
-#define WEB_PORT                    80
-#define WEBSOCKET_ENABLED           false
-#define WEBSOCKET_PORT              81
-#define WEB_DATA_REFRESH            2000            //DATA REFRESH TIME IN MILLISECONDS
-
+#include <DHT.h>
+class Settings {
+  public:
+    const bool DebuggerMode = true;
+    const uint8_t DhtType = <Dht type>                                      //DHT11 | DHT22
+    const uint8_t DhtPin = <Digital port>                                   //example: D5 | 14
+    const uint8_t RelayPin = <Digital port>                                 //example: D6 | 12
+    const uint16_t MoistureSensorDry = <Dry Measurement of moisture sensor>
+    const uint16_t MoistureSensorWet = <Wet Measurement of moisture sensor>
+    const uint8_t MoistureSensorPin = <Analog port>                         //example: A0
+    const String WifiSsdi = <SSID Name>
+    const String WifiPassword = <SSID Password>
+    const boolean WifiStaticIp = true;
+    const IPAddress WifiIp = IPAddress(192, 168, 1, 23);
+    const IPAddress WifiGateway = IPAddress(192, 168, 1, 1);
+    const IPAddress WifiSubnet = IPAddress(255, 255, 255, 0);
+    const boolean WebPublished = true;
+    const uint16_t WebPort = 80;
+    const uint16_t WebDataRefresh = 2000;            //DATA REFRESH TIME IN MILLISECONDS
+    const boolean WebSocketEnabled = false;
+    const uint16_t WebSocketPort = 81;
+};
 #endif SETTINGS_H

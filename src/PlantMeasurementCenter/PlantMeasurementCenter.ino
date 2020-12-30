@@ -8,9 +8,6 @@
 #include "Settings.h"
 #include "DFRobot_VEML7700.h"
 
-uint8_t MoistureSensorPin = MOISTURE_SENSOR_PIN;
-uint8_t DHTPin = DHT_PIN;
-uint8_t RelayPin = WATER_PUMP_RELAY_PIN;
 int relayState = LOW;
 float Temperature;
 float Humidity;
@@ -18,62 +15,68 @@ int SoilHumidity;
 float Illumination;
 unsigned long previousMillis;
 
-DHT dht(DHTPin, DHT_TYPE);
-AsyncWebServer server(WEB_PORT);
-WebSocketsServer webSocketServer = WebSocketsServer(WEBSOCKET_PORT);
+Settings settings;
+DFRobot_VEML7700 ambientLightSensor;
+DHT dht(settings.DhtPin, settings.DhtType);
+AsyncWebServer webServer(settings.WebPort);
+WebSocketsServer webSocketServer = WebSocketsServer(settings.WebSocketPort);
 WifiConfig wifiConfig;
-
-DFRobot_VEML7700 als;
 
 void setup()
 {
   Serial.begin(115200);
-  pinMode(RelayPin, OUTPUT);
-  digitalWrite(RelayPin, HIGH);
-  pinMode(DHTPin, INPUT);
-  digitalWrite(DHTPin, HIGH);
+  Serial.setDebugOutput(settings.DebuggerMode);
+
+  pinMode(settings.RelayPin, OUTPUT);
+  digitalWrite(settings.RelayPin, HIGH);
+  pinMode(settings.DhtPin, INPUT);
+  digitalWrite(settings.DhtPin, HIGH);
   dht.begin();
 
-  als.begin();
-  
-  wifiConfig.Connect();
+  ambientLightSensor.begin();
 
-  if (WEB_PUBLISHED) {
+  if (settings.WifiStaticIp) {
+    wifiConfig.configStaticIp(settings.WifiIp, settings.WifiGateway, settings.WifiSubnet);
+  }
+  wifiConfig.connect(settings.WifiSsdi.c_str(), settings.WifiPassword.c_str());
+  //  iotHubDevice.connect();
+
+  if (settings.WebPublished) {
     if (!SPIFFS.begin()) {
       Serial.println("Error mounting the file system");
     }
-    server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
-    server.serveStatic("/styles", SPIFFS, "/styles");
+    webServer.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
+    webServer.serveStatic("/styles", SPIFFS, "/styles");
 
-    if (WEBSOCKET_ENABLED) {
-      server.on("/scripts/index.js", HTTP_GET, [](AsyncWebServerRequest * request) {
+    if (settings.WebSocketEnabled) {
+      webServer.on("/scripts/index.js", HTTP_GET, [](AsyncWebServerRequest * request) {
         request->send(SPIFFS, "/scripts/websocket.js", "text/javascript");
       });
       webSocketServer.onEvent(webSocketEvent);
       webSocketServer.begin();
       Serial.println("WebSocketServer started");
     } else {
-      server.on("/scripts/index.js", HTTP_GET, [](AsyncWebServerRequest * request) {
+      webServer.on("/scripts/index.js", HTTP_GET, [](AsyncWebServerRequest * request) {
         request->send(SPIFFS, "/scripts/api.js", "text/javascript");
       });
-      server.on("/api/measurements", HTTP_GET, [](AsyncWebServerRequest * request) {
+      webServer.on("/api/measurements", HTTP_GET, [](AsyncWebServerRequest * request) {
         String measurements;
         StaticJsonDocument<120> jsonDoc;
         jsonDoc["temperature"] = Temperature;
         jsonDoc["humidity"] = Humidity;
         jsonDoc["soilHumidity"] = SoilHumidity;
         jsonDoc["illumination"] = round(Illumination);
-        jsonDoc["refreshIn"] = WEB_DATA_REFRESH;
-        jsonDoc["isWatering"] = digitalRead(RelayPin) == LOW;
+        jsonDoc["refreshIn"] = settings.WebDataRefresh;
+        jsonDoc["isWatering"] = digitalRead(settings.RelayPin) == LOW;
         serializeJson(jsonDoc, measurements);
         webSocketServer.broadcastTXT(measurements);
         request->send(200, "application/json; charset=utf-8", measurements);
       });
-      server.on("/api/water", HTTP_POST, [](AsyncWebServerRequest * request) {
+      webServer.on("/api/water", HTTP_POST, [](AsyncWebServerRequest * request) {
         water();
         String response;
         StaticJsonDocument<5> jsonDoc;
-        jsonDoc = digitalRead(RelayPin) == LOW;
+        jsonDoc = digitalRead(settings.RelayPin) == LOW;
         serializeJson(jsonDoc, response);
         request->send(200, "application/json; charset=utf-8", response);
       });
@@ -81,32 +84,35 @@ void setup()
       Serial.println("HTTPServer started");
     }
 
-    server.begin();
+    webServer.begin();
   }
-  previousMillis = millis() + WEB_DATA_REFRESH;
+  previousMillis = millis() + settings.WebDataRefresh;
 }
 
 void loop()
 {
-  if (millis() - previousMillis >= WEB_DATA_REFRESH) {
+  if (millis() - previousMillis >= settings.WebDataRefresh) {
     Temperature = dht.readTemperature();
     Humidity = dht.readHumidity();
 
-    int sensor = analogRead(MoistureSensorPin);
-    SoilHumidity = map(sensor, MOISTURE_SENSOR_WET, MOISTURE_SENSOR_DRY, 100, 0);
+    int sensor = analogRead(settings.MoistureSensorPin);
+    SoilHumidity = map(sensor, settings.MoistureSensorWet, settings.MoistureSensorDry, 100, 0);
 
-    als.getALSLux(Illumination);
+    ambientLightSensor.getALSLux(Illumination);
 
-    if (WEB_PUBLISHED && WEBSOCKET_ENABLED) {
-      String measurements;
-      StaticJsonDocument<120> jsonDoc;
+    String measurements;
+    StaticJsonDocument<120> jsonDoc;
+    jsonDoc["temperature"] = Temperature;
+    jsonDoc["humidity"] = Humidity;
+    jsonDoc["soilHumidity"] = SoilHumidity;
+    jsonDoc["illumination"] = round(Illumination);
+    serializeJson(jsonDoc, measurements);
+    //    iotHubDevice.sendMessage(const_cast<char*>(measurements.c_str()));
+
+    if (settings.WebPublished && settings.WebSocketEnabled) {
       jsonDoc["command"] = "measurements";
-      jsonDoc["temperature"] = Temperature;
-      jsonDoc["humidity"] = Humidity;
-      jsonDoc["soilHumidity"] = SoilHumidity;
-      jsonDoc["illumination"] = round(Illumination);
-      jsonDoc["refreshIn"] = WEB_DATA_REFRESH;
-      jsonDoc["isWatering"] = digitalRead(RelayPin) == LOW;
+      jsonDoc["refreshIn"] = settings.WebDataRefresh;
+      jsonDoc["isWatering"] = digitalRead(settings.RelayPin) == LOW;
       serializeJson(jsonDoc, measurements);
       webSocketServer.broadcastTXT(measurements);
     }
@@ -114,11 +120,11 @@ void loop()
     previousMillis = millis();
   }
 
-  if (WEB_PUBLISHED && WEBSOCKET_ENABLED) webSocketServer.loop();
+  if (settings.WebPublished && settings.WebSocketEnabled) webSocketServer.loop();
 }
 
 void water() {
-  digitalWrite(RelayPin, !digitalRead(RelayPin));
+  digitalWrite(settings.RelayPin, !digitalRead(settings.RelayPin));
 }
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
@@ -132,7 +138,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
       String response;
       StaticJsonDocument<120> jsonDoc;
       jsonDoc["command"] = "water";
-      jsonDoc["isWatering"] = digitalRead(RelayPin) == LOW;
+      jsonDoc["isWatering"] = digitalRead(settings.RelayPin) == LOW;
       serializeJson(jsonDoc, response);
       webSocketServer.broadcastTXT(response);
     }
